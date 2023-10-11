@@ -2,7 +2,7 @@
 # Store Item Demand Forecasting Challenge
 #####################################################
 ## Problem Statement
-# Predict 3 months of item sales at different stores
+# Predict 3 months of sales at different stores
 
 ## Dataset Overview
 # The dataset contains 5 years of store-item sales data, for 50 different items at 10 different stores.
@@ -207,7 +207,7 @@ lgb_params = {'num_leaves': 10, # -->max number of leaves on a tree
               'max_depth': 5,
               'verbose': 0,
               'num_boost_round': 1000,
-              'early_stopping': 200, #--> if the error does not decrease, stop modeling.
+              'early_stopping_rounds': 200, #--> if the error does not decrease, stop modeling.
               'nthread': -1}
 
 lgbtrain = lgb.Dataset(data=X_train, label=Y_train, feature_name=cols)
@@ -217,9 +217,10 @@ lgbval = lgb.Dataset(data=X_val, label=Y_val, reference=lgbtrain, feature_name=c
 model = lgb.train(lgb_params, lgbtrain,
                   valid_sets=[lgbtrain, lgbval],
                   num_boost_round=lgb_params['num_boost_round'],
-                  early_stopping=lgb_params['early_stopping'],
+                  early_stopping_rounds=lgb_params['early_stopping_rounds'],
                   feval=lgbm_smape,
-                  verbose=100)
+                  verbose_eval=100)
+#-- > LightGBM 4.0.0 does not support early_stopping_rounds and verbose_eval in train() function
 
 y_pred_val = model.predict(X_val, num_iteration=model.best_iteration)
 
